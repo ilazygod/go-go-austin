@@ -1,0 +1,68 @@
+GO！GO！AUSTIN！交付白屏复核与运行测试
+日期：2026-10-12（用户时区 Asia/Shanghai）
+
+结论
+原网页部署 ZIP 完整，入口路径正确。Safari 通过 file:// 打开时，模块 JavaScript 与 crossorigin CSS 被浏览器拦截，因此白屏。通过本地 HTTP 的根路径和仓库式子目录均实际显示封面并成功进入第一关，控制台没有错误。
+原交付说明已有服务器命令，但未醒目标出“不能双击 HTML”，容易造成误解；本次已明确更正。
+另外交付可由 Safari 在 file:// 下运行的单文件 HTML，不需要外部素材目录。
+
+1. 检查对象与完整性
+原包：go-go-austin-pages.zip
+原包 SHA256：e7851958ec55d4b454de8638e52013293d0a80e072fa2d8ec60effdbb9258ec8
+原包没有被覆盖。解压原包进行测试，共 53 个文件，未压缩总计 11,953,036 字节。
+包含主 JavaScript assets/index-_cXWuQUN.js（226,203 字节），CSS assets/index-BZhK9d-s.css（25,828 字节）、assets/images 内 41 张运行图片、assets/audio 内 4 首 MP3，另有两个供网页图标/分享使用的图片副本、index.html、manifest.json、.nojekyll、第三方声明。
+所有原包文件在 HTTP 根目录和 /austin-test/ 子目录均逐个请求，状态 200，响应正文逐字节等于解压文件。53 个文件的路径、大小、SHA256 和 HTTP 状态见《原包文件与HTTP校验.json》。
+运行图片准确数量为 41；如先前报告出现 39，以这次原包清点和 Safari 实际资源记录为准。
+代码常量还保留四个大型组合参考图名称（austin_player、red_dragon、frankenstein_monster、teddy_bear_boss），但运行资源表已排除它们，部署包无须包含它们。原始素材保留在源码/原始 ZIP 中。
+
+2. 入口与路径
+index.html 的 JavaScript、CSS、图标及 manifest 链接均为 ./assets/... 或 ./manifest.json，全部能对应到包内文件。
+manifest 的 start_url 为 ./，图标也使用相对路径。
+Safari 子目录资源记录：images=41，audio=4，outsideSubdirectory=[]。
+因此没有发现本次白屏由缺文件或入口链接写错造成的证据。
+
+3. Safari 文件协议实测：原包失败
+打开原包 index.html 的 file:///.../index.html，实际白屏。
+控制台原文：
+Origin null is not allowed by Access-Control-Allow-Origin. Status code: 0
+Failed to load resource: Origin null is not allowed by Access-Control-Allow-Origin. Status code: 0
+以上各一对，分别关联 manifest.json、assets/index-_cXWuQUN.js、assets/index-BZhK9d-s.css（共 6 条）。
+另有：Not allowed to load local resource: file:///favicon.ico（第 7 条，标签页图标）。
+模块主脚本被阻断使 React 无法挂载，是白屏的直接原因；同时 CSS 和 manifest 也被阻断。没有禁用 CORS、文件安全或其他浏览器保护。
+截图与控制台记录：Safari-file协议白屏.png、Safari-file控制台.txt。
+原部署版必须以 HTTP/HTTPS 运行。这符合浏览器模块的本地文件限制说明：
+https://developer.mozilla.org/en-US/docs/Web/JavaScript/Guide/Modules
+
+4. Safari HTTP 根路径实测：通过
+网址：http://127.0.0.1:8873/
+从未修改的原包文件启动。封面背景、标题和主角正常；START ADVENTURE 能进入第一关，得分推进，暂停菜单正常出现。
+控制台“全部”视图没有错误或警告。
+4 首音乐资源实际加载；点击启用音乐后 Safari 显示声音输出标志（此标志验证播放活动，不能替代听感审查）。
+图片资源记录 41，4 个音频资源均有传输记录。
+证据：Safari-HTTP控制台.txt、Safari-HTTP资源记录.txt、Safari-HTTP运行.png。
+
+5. Safari HTTP 子目录实测：通过
+网址：http://127.0.0.1:8873/austin-test/
+使用同一套原包文件，模拟 GitHub Pages 的 /仓库名/ 路径。
+封面、开始第一关、得分推进、音乐启用、暂停正常；控制台没有错误或警告。
+实际读取 41 张运行图片和 4 首 MP3，所有本机资源请求留在 /austin-test/，没有向站点根目录请求资源。
+证据：Safari-子目录控制台.txt、Safari-子目录运行.png。
+所有文件还经过单独 HTTP 200 与响应内容一致性校验。
+未在真实 GitHub Pages 发布，没有修改任何仓库；线上平台配置、缓存和最终网址尚未实测。
+
+6. Safari 单文件 file:// 实测：通过游戏运行
+文件：GO-GO-AUSTIN-双击即玩.html（16,608,544 字节，约 15.84 MiB）
+将原包 CSS、编译后的 JavaScript 以及所有 41 张运行图片、4 首 MP3 嵌入 HTML。取消外部模块脚本加载，使用内联普通脚本；仅在资源路径解析函数中加入嵌入资源映射。没有修改关卡、玩法、动画、音乐开关或游戏状态逻辑。
+41 张图片和 4 首 MP3 从嵌入数据解码后，与原部署文件逐字节一致。CSS 完整保留；JavaScript 除资源路径解析函数的封装适配外与原包相同。
+直接以 Safari file:// 打开，完成加载并显示完整封面、主角、标题。点击启用音乐后有声音输出标志。实际运行推进至第二关、第三关，暂停及 Restart Level 重开当前关卡正常。
+另外通过 Safari 控制台，逐个创建媒体解码探针读取嵌入的 4 首 MP3：全部 loadedmetadata 成功，duration=30.772244897959183 秒，无媒体解码错误。探针仅用于测试，不包含在交付文件中；这不等同于逐曲人工试听或完整通关。
+控制台仍有 1 条 Safari 自动请求图标的错误：Not allowed to load local resource: file:///favicon.ico。
+未发现游戏脚本、图片、音乐加载错误。这条图标错误没有阻止封面、关卡或音乐运行，因此没有为消除它而修改游戏或降低浏览器安全设置。
+单文件移除网页安装 manifest，避免 file:// 下额外请求；部署版的 manifest 原样保留。
+证据：Safari-单文件音频解码.txt、Safari-单文件封面.png、Safari-单文件运行控制台.txt。
+
+7. 本次变更范围与测试边界
+原部署 ZIP、源码和原始导出包均保留。本次新部署 ZIP 只额外加说明/报告，原有 53 文件逐字节保持一致。
+单文件版仅改变资源封装方式，没有改动玩法、美术或音乐内容。
+以上是本机 Safari 的实际浏览器运行测试、控制台证据和资源校验；不是仅以构建成功判断可运行。
+尚未验证真实 GitHub Pages 线上环境、其他 Safari 版本、手机文件管理器打开或所有结局分支；没有声称全平台或完整通关测试。

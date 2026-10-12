@@ -1,0 +1,41 @@
+GO！GO！AUSTIN！使用与部署说明（2026-10-12）
+
+【先看这里】
+网页部署版 go-go-austin-pages.zip / go-go-austin-pages-说明补全.zip 不支持在 Safari 中双击 index.html 运行。
+它必须通过 HTTP/HTTPS 服务器打开；直接双击会使用 file://，Safari 会拦截模块 JavaScript 和带跨域属性的 CSS，导致白屏。
+无需降低 Safari 的安全设置。
+
+【希望双击就能玩】
+使用另外提供的 GO-GO-AUSTIN-双击即玩.html。
+这是独立的单文件：JavaScript、CSS、41 张运行图片和 4 首 MP3 全部已嵌入，不需要旁边的 assets 文件夹，也不需要联网下载素材。
+在 Mac 上双击它（或右键 → 打开方式 → Safari）。文件约 16.6 MB，等待素材解码后出现 START ADVENTURE。
+音乐仍需要点击 ENABLE AUDIO & MUSIC 或首次交互后播放。
+已实测 Safari 的 file:// 运行、关卡推进、暂停、重开当前关卡，以及 4 首 MP3 的解码。
+Safari 可能显示 “Not allowed to load local resource: file:///favicon.ico” 的标签页图标错误；实测不影响游戏与音乐。
+单文件不提供安装为 PWA 的 manifest；如需 GitHub Pages 部署，优先使用网页部署版。
+
+【本地预览网页部署版】
+1. 解压部署 ZIP。
+2. 在终端进入包含 index.html 和 assets 的 go-go-austin-pages 文件夹。
+3. 如果电脑已安装 Python 3，运行：
+   python3 -m http.server 8080 --bind 127.0.0.1
+4. 在 Safari 打开 http://127.0.0.1:8080/ 。
+5. 保持终端服务器运行；结束时按 Control+C。
+也可以使用已有的静态网页服务器。双击 index.html 不能替代这一步。
+
+【获准后部署 GitHub Pages】
+本次未发布或修改任何 GitHub 仓库。
+把文件夹内所有网站文件放到选择的发布位置，必须让该位置直接包含 index.html、assets、manifest.json 和 .nojekyll。
+不要只上传 ZIP，也不要遗漏 assets；不要额外套一层外部文件夹。
+若使用发布分支根目录，Pages 设置选择该分支和 / (root)。
+若使用 /docs，放入 docs 后选择该分支和 /docs。
+网站入口与资源使用相对路径，manifest 的 start_url 为 ./。
+本次已在 Safari 实测 http://127.0.0.1:8873/austin-test/，模拟 https://用户名.github.io/仓库名/ 的子目录路径；所有资源留在该子目录，正常显示和进入游戏。
+这属于本地子目录实测，不代表已经在 GitHub 上发布或验证真实线上网址。
+
+【包的区别】
+go-go-austin-pages-说明补全.zip：原部署文件逐字节保留，另外加入本说明及白屏复核报告。
+GO-GO-AUSTIN-双击即玩.html：单文件离线版，只改变资源装载/封装方式；没有修改玩法、关卡、美术或音乐。
+go-go-austin-source.zip：上次交付的源码，本次没有改动。需要重新构建时参考源码中的 README.txt。
+
+完整测试结论、控制台原文和验证范围见《白屏复核与运行测试.txt》及白屏复核证据文件夹。

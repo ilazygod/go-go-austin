@@ -1,0 +1,22 @@
+{
+  "name": "GO！GO！AUSTIN！",
+  "short_name": "GO！GO！AUSTIN！",
+  "description": "Help Austin sneak past giant sleeping bosses, leap over dangerous hazards, and sprint to the grand birthday victory celebration!",
+  "start_url": "./",
+  "display": "standalone",
+  "background_color": "#0f172a",
+  "theme_color": "#f59e0b",
+  "icons": [
+    {
+      "src": "./assets/images/ui_title_logo.png",
+      "sizes": "512x512",
+      "type": "image/png",
+      "purpose": "any maskable"
+    },
+    {
+      "src": "./assets/images/bg_title_screen.png",
+      "sizes": "1376x768",
+      "type": "image/png"
+    }
+  ]
+}
